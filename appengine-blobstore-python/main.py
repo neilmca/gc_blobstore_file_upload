@@ -50,10 +50,25 @@ class GetServingUrlHandler(blobstore_handlers.BlobstoreDownloadHandler):
         if not blobstore.get(image_uploaded_key):
             self.error(404)
         else:
+
+            #from here https://groups.google.com/forum/#!topic/google-appengine-python/avUg-ADHanI
+            #Get some bytes of your Blobstore value (50000 bytes should be enough to get the necessary header information):
+
+            data = blobstore.fetch_data(image_uploaded_key, 0, 50000)
+
+            #Create an Image instance and check its 'width' and 'height':
+
+            img = images.Image(image_data=data)
+            
+           
+            
+
             serving_url = images.get_serving_url(image_uploaded_key)
             logging.info('serving_url = %s' % serving_url)
             #self.send_blob(image_uploaded_key)
-            self.response.write('image serving_url = %s' % serving_url)
+            self.response.write('image serving_url (height=%s, width=%s) = %s' % (str(img.height), str(img.width), serving_url))
+
+
 # [END download_handler]
 
 logging.getLogger().setLevel(logging.DEBUG)
